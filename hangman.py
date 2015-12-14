@@ -2,27 +2,36 @@
 User can look at game history to check on words learned"""
 import random, json, tkinter
 
-def getRandomWord(list):
-    index = random.randint(0, len(list) - 1)
-    return list[index]
+# variables
+incorrectLetters = ''
+correctLetters = ''
+wordList = ["hello", "chubby", "fats"]
+guessesLeft = 5
 
+# load dictionary.json into a python dict
+with open('dictionary.json') as file:
+    dictionary = json.load(file)
+dictKeys = list(dictionary.keys())
+
+# functions
 def getGuess(alreadyGuessed):
     print('Please enter in your guess:')
     guess = input()
-    guess = guess.lower()
+    guess = guess.upper()
     if len(guess) != 1:
         print('Please enter a single letter')
     elif guess in alreadyGuessed:
         print('You have already guessed this letter')
-    elif guess not in 'abcdefghijklmnopqrstuvwxyz':
-        print('Please print a letter')
+    elif guess not in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        print('Please print an uppercase letter')
     else:
         alreadyGuessed + guess
         return guess
     getGuess(alreadyGuessed)  #calls again if no value is returned
 
+# still need to present the right and wrong letters  guessed while playing the game
 def playGame(numGuesses, incorrectList, correctList, wordList):
-    word = getRandomWord(wordList)
+    word = random.choice(wordList)
     while numGuesses > 0:
         guess = str(getGuess(incorrectList + correctList))
         guessedAllLetters = True
@@ -40,9 +49,10 @@ def playGame(numGuesses, incorrectList, correctList, wordList):
             incorrectList += guess
             numGuesses -= 1
             print("Sorry, your guess was incorrect. You have " + str(numGuesses) + " left.")
-            if guessesLeft == 0:
-                print("Gameover :D")
+            if numGuesses == 0:
+                print("Gameover :D. Your word was " + word)
                 break
+    print("Definition: " + word + ": " + dictionary[word])
     if playAgain():
         incorrectList = ''
         correctList = ''
@@ -58,27 +68,12 @@ def playAgain():
     else:
         return False
 
-incorrectLetters = ''
-correctLetters = ''
-wordList = ["hello", "chubby", "fats"]
-guessesLeft = 5
+# start game
 
-#start game
-
-""" top = tkinter.Tk()
+"""  try to use tkinter for GUI
+top = tkinter.Tk()
 top.mainloop() """
 
-playGame(guessesLeft, incorrectLetters, correctLetters, wordList)
+playGame(guessesLeft, incorrectLetters, correctLetters, dictKeys)
 
-
-
-
-
-dictionary = {}
-
-with open('dictionary.json') as file:
-    dictionary = json.load(file)
-    """for line in file:
-        dictionary.append(json.loads(line))"""
-dictKeys = dictionary.keys()
-print(dictKeys)
+""" Also try to allow users to save their past words and look over them to review the definitions """
